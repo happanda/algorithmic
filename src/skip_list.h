@@ -10,7 +10,7 @@ namespace algic
     
     /**********************************************************/
     /*                     skip_list                          */
-    template <class T>
+    template <class T, class RandomGen>
     struct skip_list
     {
         struct iterator
@@ -18,7 +18,7 @@ namespace algic
         {
         };
 
-        skip_list();
+        skip_list(RandomGen& randGen, float prob = 0.36787944117144f /* prob = 1 / e */);
         ~skip_list();
 
         bool insert(T const& t);
@@ -26,7 +26,11 @@ namespace algic
         bool contains(T const& t);
         
     private:
-        node_base*  mHead;
+        bool prob() const;
+
+        mutable RandomGen& mRand;
+        float mProb;
+        node_base* mHead;
     };
 } // namespace algic
 

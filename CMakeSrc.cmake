@@ -2,6 +2,7 @@
 set(SOURCE_FILES_SKIP_LIST
 ${SourcePath}/skip_list.h
 ${SourcePath}/skip_list.hpp
+${SourcePath}/random.h
 )
 
 set(SOURCE_FILES_TEST

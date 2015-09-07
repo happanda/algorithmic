@@ -126,25 +126,42 @@ namespace algic
     
     /**********************************************************/
     /*                      skip_list                         */
-    template <class T>
-    skip_list<T>::skip_list()
-        : mHead(new node_head<1>())
+    template <class T, class RandomGen>
+    skip_list<T, RandomGen>::skip_list(RandomGen& randGen, float prob)
+        : mRand(randGen)
+        , mHead(new node_head<1>())
+        , mProb(prob)
+    {
+        assert(prob >= 0.0f && "Probability can't be negative");
+        assert(prob <= 1.0f && "Probability must be not greater than 1");
+    }
+
+    template <class T, class RandomGen>
+    skip_list<T, RandomGen>::~skip_list()
+    {
+        delete mHead;
+    }
+
+    template <class T, class RandomGen>
+    bool skip_list<T, RandomGen>::insert(T const& t)
+    {
+
+    }
+
+    template <class T, class RandomGen>
+    bool skip_list<T, RandomGen>::remove(T const& t)
     {
     }
 
-    template <class T>
-    bool skip_list<T>::insert(T const& t)
+    template <class T, class RandomGen>
+    bool skip_list<T, RandomGen>::contains(T const& t)
     {
     }
 
-    template <class T>
-    bool skip_list<T>::remove(T const& t)
+    template <class T, class RandomGen>
+    bool skip_list<T, RandomGen>::prob() const
     {
-    }
-
-    template <class T>
-    bool skip_list<T>::contains(T const& t)
-    {
+        return mRand() < mProb;
     }
 } // namespace algic
 
