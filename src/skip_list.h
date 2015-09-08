@@ -26,7 +26,9 @@ namespace algic
         bool contains(T const& t);
         
     private:
-        bool prob() const;
+        node_base* findPlace(T const& t, size_t height, size_t level, node_base* start);
+        bool coin() const;
+        size_t multiCoin() const;
 
         mutable RandomGen& mRand;
         float mProb;
