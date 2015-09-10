@@ -206,41 +206,19 @@ namespace algic
     bool skip_list<T, RandomGen>::insert(T const& t)
     {
         size_t const H = mHead->height();
+            // treat first element in a special way
         if (H == 1 && !mHead->next(0))
-        { // first element, treat specially
+        {
             node_base* newNode = new node<T>(1, t);
             mHead->set(0, newNode);
             return true;
         }
 
         std::vector<node_base*> visited(H + 1, nullptr);
+        if (visit(t, &visited)) // if already exists
+            return false;
 
-        node_base* curNode = mHead;
-        int curLvl = H - 1;
-        bool out = false;
-        while (!out)
-        {
-            auto nextNode = curNode->next(curLvl);
-            if (nextNode && less(nextNode, t))
-            {
-                curNode = nextNode;
-                continue;
-            }
-            else if (curLvl >= 0)
-            {
-                visited[curLvl] = curNode;
-                --curLvl;
-                if (curLvl < 0)
-                {
-                    if (nextNode && eq(nextNode, t))
-                        return false;
-                    curLvl = 0;
-                    out = true;
-                    continue;
-                }
-            }
-        }
-
+            // randomly choose the height of the new element
         size_t const newLvl = multiCoin();
         node_base* newNode = new node<T>(newLvl, t);
         if (newLvl > H)
@@ -249,6 +227,7 @@ namespace algic
             mHead->set(H, newNode);
         }
 
+            // reassign links
         size_t const minLvl = std::min(newLvl, H);
         for (size_t i = 0; i < minLvl; ++i)
         {
@@ -261,81 +240,30 @@ namespace algic
     template <class T, class RandomGen>
     bool skip_list<T, RandomGen>::remove(T const& t)
     {
-        size_t const H = mHead->height();
-        if (H == 1 && !mHead->next(0))
-            return false;
-
         std::vector<node_base*> visited(H, nullptr);
-
-        node_base* foundNode = nullptr;
-        node_base* curNode = mHead;
-        int curLvl = H - 1;
-        bool out = false;
-        while (!out)
+        if (node_base* foundNode = visit(t, &visited))
         {
-            auto nextNode = curNode->next(curLvl);
-            if (nextNode && less(nextNode, t))
+                // reassign links and delete the element
+            size_t const H = mHead->height();
+            for (size_t i = 0; i < H; ++i)
             {
-                curNode = nextNode;
-                continue;
+                if (visited[i] && visited[i]->next(i) == foundNode)
+                    visited[i]->set(i, foundNode->next(i));
             }
-            else if (curLvl >= 0)
-            {
-                visited[curLvl] = curNode;
-                --curLvl;
-                if (curLvl < 0)
-                {
-                    if (nextNode && eq(nextNode, t))
-                    {
-                        foundNode = nextNode;
-                        out = true;
-                        break;
-                    }
-                    else
-                        return false;
-                }
-            }
+            delete foundNode;
+            return true;
         }
-
-        if (!foundNode)
+        else
             return false;
-        for (size_t i = 0; i < H; ++i)
-        {
-            if (visited[i] && visited[i]->next(i) == foundNode)
-                visited[i]->set(i, foundNode->next(i));
-        }
-        delete foundNode;
-        return true;
     }
 
     template <class T, class RandomGen>
     bool skip_list<T, RandomGen>::contains(T const& t)
     {
-        size_t const H = mHead->height();
-
-        node_base* curNode = mHead;
-        int curLvl = H - 1;
-        bool out = false;
-        while (!out)
-        {
-            auto nextNode = curNode->next(curLvl);
-            if (nextNode && less(nextNode, t))
-            {
-                curNode = nextNode;
-                continue;
-            }
-            else if (curLvl >= 0)
-            {
-                --curLvl;
-                if (curLvl < 0)
-                {
-                    if (nextNode && eq(nextNode, t))
-                        return true;
-                    return false;
-                }
-            }
-        }
-        return false;
+        if (visit(t))
+            return true;
+        else
+            return false;
     }
 
     template <class T, class RandomGen>
@@ -351,25 +279,40 @@ namespace algic
     }
 
     template <class T, class RandomGen>
-    node_base* skip_list<T, RandomGen>::findPlace(T const& t, size_t height, size_t level, node_base* start)
+    node_base* skip_list<T, RandomGen>::visit(T const& t, std::vector<node_base*>* visited)
     {
-        if (!start)
+        size_t const H = mHead->height();
+        if (H == 1 && !mHead->next(0))
             return nullptr;
-        
-        if (less(start, t))
+
+        node_base* foundNode = nullptr;
+        node_base* curNode = mHead;
+        int curLvl = H - 1;
+        bool out = false;
+        while (!out)
         {
-            auto res = findPlace(t, height, level, start->next(level));
-            if (!res)
+            auto nextNode = curNode->next(curLvl);
+            if (nextNode && less(nextNode, t))
             {
-                if (level > 0)
-                    return findPlace(t, height, level - 1, start);
-                else
-                    return start;
+                curNode = nextNode;
+                continue;
+            }
+            else if (curLvl >= 0)
+            {
+                if (visited)
+                    (*visited)[curLvl] = curNode;
+                --curLvl;
+                if (curLvl < 0)
+                {
+                    if (nextNode && eq(nextNode, t))
+                        return nextNode;
+                    else
+                        return nullptr;
+                }
             }
         }
-        if (gt(start, t))
-            return nullptr;
-        return start;
+        assert(false && "This statement should not be reached");
+        return nullptr;
     }
 
     template <class T, class RandomGen>

@@ -28,7 +28,7 @@ namespace algic
         void print() const;
 
     private:
-        node_base* findPlace(T const& t, size_t height, size_t level, node_base* start);
+        node_base* visit(T const& t, std::vector<node_base*>* visited = nullptr);
         bool coin() const;
         size_t multiCoin() const;
 
