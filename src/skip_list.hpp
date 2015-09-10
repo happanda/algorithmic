@@ -4,6 +4,7 @@
 #include <array>
 #include <cassert>
 #include <functional>
+#include <iostream>
 #include <list>
 #include <vector>
 
@@ -199,6 +200,13 @@ namespace algic
     bool skip_list<T, RandomGen>::insert(T const& t)
     {
         size_t const H = mHead->height();
+        if (H == 1 && !mHead->next(0))
+        { // first element, treat specially
+            node_base* newNode = new node<T>(1, t);
+            mHead->set(0, newNode);
+            return true;
+        }
+
         std::vector<node_base*> visited(H, nullptr);
 
         node_base* curNode = mHead;
@@ -235,9 +243,9 @@ namespace algic
             mHead->set(H, newNode);
         }
 
-        for (size_t i = 0; i < H - 1; ++i)
+        for (size_t i = 0; i < newLvl - 1; ++i)
         {
-            newNode->set(i, visited[i]);
+            newNode->set(i, visited[i]->next(i));
             visited[i]->set(i, newNode);
         }
         return true;
@@ -265,6 +273,18 @@ namespace algic
                 break;
         }
         return false;
+    }
+
+    template <class T, class RandomGen>
+    void skip_list<T, RandomGen>::print() const
+    {
+        node_base* curNode = mHead;
+        while (curNode->next(0))
+        {
+            curNode = curNode->next(0);
+            auto tNode = curNode->as<T>();
+            std::cout << tNode->value() << std::endl;
+        }
     }
 
     template <class T, class RandomGen>
@@ -299,7 +319,7 @@ namespace algic
     size_t skip_list<T, RandomGen>::multiCoin() const
     {
         size_t const maxH{ mHead->height() + 1 };
-        size_t count{ 0 };
+        size_t count{ 1 };
         while (mRand() < mProb)
         {
             ++count;

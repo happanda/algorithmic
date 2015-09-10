@@ -25,6 +25,8 @@ namespace algic
         bool remove(T const& t);
         bool contains(T const& t);
         
+        void print() const;
+
     private:
         node_base* findPlace(T const& t, size_t height, size_t level, node_base* start);
         bool coin() const;
