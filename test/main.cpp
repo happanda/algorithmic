@@ -1,25 +1,19 @@
 #include <iostream>
+#include <set>
 #include <string>
 #include "random.h"
 #include "skip_list.h"
 
-struct foo
-{
-    foo()
-    {
-        std::cout << "Construct foo" << std::endl;
-    }
 
-    foo(foo const& f)
+template <class T, class RandomGen>
+void print(algic::skip_list<T, RandomGen> const& slist)
+{
+    for (auto it = std::cbegin(slist); it != std::cend(slist); ++it)
     {
-        std::cout << "Copy construct foo" << std::endl;
+        std::cout << *it << std::endl;
     }
-    
-    ~foo()
-    {
-        std::cout << "Destroy foo" << std::endl;
-    }
-};
+}
+
 
 int main(int argc, char* argv[])
 {
@@ -36,13 +30,17 @@ int main(int argc, char* argv[])
         slist.insert(rnd);
     }
     std::cout << std::endl << "Print list" << std::endl;
-
-    slist.print();
+    print(slist);
 
     algic::skip_list<int, random<float>>  slistSwap(randGen);
     std::swap(slist, slistSwap);
+    //print(slistSwap);
 
     std::cout << std::endl << "List constains 12: " << slist.contains(12) << std::endl;
+    std::set<int> sint({ 1, 2, 3 });
+    std::cout << *(sint.begin()) << std::endl;
+    std::cout << *(++sint.begin()) << std::endl;
+    std::cout << *(sint.begin()++) << std::endl;
 
     getchar();
     return 0;

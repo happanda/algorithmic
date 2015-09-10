@@ -179,7 +179,67 @@ namespace algic
 
 
     /**********************************************************/
+    /*                 slist_const_iterator                   */
+
+    template <class T>
+    template <class RandomGen>//, class Compare = std::less<Key>, class Allocator = std::allocator<T>>
+    slist_const_iterator<T>::slist_const_iterator(skip_list<T, RandomGen/*, Compare, Allocator*/> const* slist, node_base* node)
+        : mSlist(static_cast<void const*>(slist))
+        , mNode(node)
+    {
+    }
+
+    template <class T>
+    slist_const_iterator<T>::slist_const_iterator(slist_const_iterator const& rhs)
+        : mSlist(rhs.mSlist)
+        , mNode(rhs.mNode)
+    {
+    }
+
+    template <class T>
+    slist_const_iterator<T> const& slist_const_iterator<T>::operator=(slist_const_iterator const& rhs)
+    {
+        mSlist = rhs.mSlist;
+        mNode = rhs.mNode;
+    }
+
+    template <class T>
+    T const& slist_const_iterator<T>::operator*() const
+    {
+        return mNode->as<T>()->value();
+    }
+
+    template <class T>
+    slist_const_iterator<T>& slist_const_iterator<T>::operator++()
+    {
+        mNode = mNode->next(0);
+        return *this;
+    }
+
+    template <class T>
+    slist_const_iterator<T> slist_const_iterator<T>::operator++(int)
+    {
+        auto prevIter = *this;
+        mNode = mNode->next(0);
+        return prevIter;
+    }
+
+    template <class T>
+    bool slist_const_iterator<T>::operator==(slist_const_iterator const& rhs)
+    {
+        return mSlist == rhs.mSlist && mNode == rhs.mNode;
+    }
+
+    template <class T>
+    bool slist_const_iterator<T>::operator!=(slist_const_iterator const& rhs)
+    {
+        return mSlist != rhs.mSlist || mNode != rhs.mNode;
+    }
+
+    
+    /**********************************************************/
     /*                      skip_list                         */
+
     template <class T, class RandomGen>
     skip_list<T, RandomGen>::skip_list(RandomGen& randGen, float prob)
         : mRand(randGen)
@@ -201,6 +261,43 @@ namespace algic
             curNode = mHead;
         }
     }
+
+    template <class T, class RandomGen>
+    typename skip_list<T, RandomGen>::iterator skip_list<T, RandomGen>::begin()
+    {
+        return slist_const_iterator<T>(this, mHead->next(0));
+    }
+
+    template <class T, class RandomGen>
+    typename skip_list<T, RandomGen>::const_iterator skip_list<T, RandomGen>::begin() const
+    {
+        return slist_const_iterator<T>(this, mHead->next(0));
+    }
+
+    template <class T, class RandomGen>
+    typename skip_list<T, RandomGen>::const_iterator skip_list<T, RandomGen>::cbegin() const
+    {
+        return slist_const_iterator<T>(this, mHead->next(0));
+    }
+
+    template <class T, class RandomGen>
+    typename skip_list<T, RandomGen>::iterator skip_list<T, RandomGen>::end()
+    {
+        return slist_const_iterator<T>(this, nullptr);
+    }
+
+    template <class T, class RandomGen>
+    typename skip_list<T, RandomGen>::const_iterator skip_list<T, RandomGen>::end() const
+    {
+        return slist_const_iterator<T>(this, nullptr);
+    }
+
+    template <class T, class RandomGen>
+    typename skip_list<T, RandomGen>::const_iterator skip_list<T, RandomGen>::cend() const
+    {
+        return slist_const_iterator<T>(this, nullptr);
+    }
+
 
     template <class T, class RandomGen>
     void skip_list<T, RandomGen>::swap(skip_list& rhs)
@@ -300,18 +397,6 @@ namespace algic
             return true;
         else
             return false;
-    }
-
-    template <class T, class RandomGen>
-    void skip_list<T, RandomGen>::print() const
-    {
-        node_base* curNode = mHead;
-        while (curNode->next(0))
-        {
-            curNode = curNode->next(0);
-            auto tNode = curNode->as<T>();
-            std::cout << tNode->value() << std::endl;
-        }
     }
 
     template <class T, class RandomGen>
