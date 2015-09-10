@@ -39,6 +39,9 @@ int main(int argc, char* argv[])
 
     slist.print();
 
+    algic::skip_list<int, random<float>>  slistSwap(randGen);
+    std::swap(slist, slistSwap);
+
     std::cout << std::endl << "List constains 12: " << slist.contains(12) << std::endl;
 
     getchar();

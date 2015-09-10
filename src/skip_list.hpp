@@ -203,6 +203,40 @@ namespace algic
     }
 
     template <class T, class RandomGen>
+    void skip_list<T, RandomGen>::swap(skip_list& rhs)
+    {
+        std::swap(mRand, rhs.mRand);
+        std::swap(mProb, rhs.mProb);
+        std::swap(mHead, rhs.mHead);
+        std::swap(mSize, rhs.mSize);
+    }
+
+    template <class T, class RandomGen>
+    bool skip_list<T, RandomGen>::empty() const
+    {
+        return (mHead->next(0) == nullptr);
+    }
+
+    template <class T, class RandomGen>
+    typename skip_list<T, RandomGen>::size_type skip_list<T, RandomGen>::size() const
+    {
+        return mSize;
+    }
+
+    template <class T, class RandomGen>
+    void skip_list<T, RandomGen>::clear()
+    {
+        node_base* curNode = mHead;
+        while (mHead)
+        {
+            mHead = mHead->next(0);
+            delete curNode;
+            curNode = mHead;
+        }
+        mHead = new node_base(1);
+    }
+
+    template <class T, class RandomGen>
     bool skip_list<T, RandomGen>::insert(T const& t)
     {
         size_t const H = mHead->height();
@@ -234,11 +268,12 @@ namespace algic
             newNode->set(i, visited[i]->next(i));
             visited[i]->set(i, newNode);
         }
+        ++mSize;
         return true;
     }
 
     template <class T, class RandomGen>
-    bool skip_list<T, RandomGen>::remove(T const& t)
+    bool skip_list<T, RandomGen>::erase(T const& t)
     {
         std::vector<node_base*> visited(H, nullptr);
         if (node_base* foundNode = visit(t, &visited))
@@ -251,6 +286,7 @@ namespace algic
                     visited[i]->set(i, foundNode->next(i));
             }
             delete foundNode;
+            --mSize;
             return true;
         }
         else
