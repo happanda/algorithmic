@@ -58,6 +58,7 @@ namespace algic
         iterator begin();
         const_iterator begin() const;
         const_iterator cbegin() const;
+
         iterator end();
         const_iterator end() const;
         const_iterator cend() const;
@@ -65,13 +66,22 @@ namespace algic
         void swap(skip_list& rhs);
 
         bool empty() const;
+
         size_type size() const;
 
         void clear();
 
         pairib insert(T const& t);
+
         pairib insert(T&& t);
+
+        template <class IterType>
+        void insert(IterType first, IterType last);
+
+        void insert(std::initializer_list<value_type> ilist);
+
         bool erase(T const& t);
+
         bool contains(T const& t);
         
     private:

@@ -376,6 +376,22 @@ namespace algic
     }
 
     template <class T, class RandomGen>
+    template <class IterType>
+    void skip_list<T, RandomGen>::insert(IterType first, IterType last)
+    {
+        for (auto it = first; it != last; ++it)
+        {
+            insert(*it);
+        }
+    }
+
+    template <class T, class RandomGen>
+    void skip_list<T, RandomGen>::insert(std::initializer_list<value_type> ilist)
+    {
+        insert(std::cbegin(ilist), std::cend(ilist));
+    }
+
+    template <class T, class RandomGen>
     bool skip_list<T, RandomGen>::erase(T const& t)
     {
         std::vector<node_base*> visited(H, nullptr);
