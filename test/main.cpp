@@ -23,28 +23,24 @@ struct foo
 
 int main(int argc, char* argv[])
 {
-    std::srand(std::time(nullptr));
+    std::srand(static_cast<unsigned int>(std::time(nullptr)));
 
     random<float> randGen;
+    algic::skip_list<int, random<float>>  slist(randGen);
+
+    std::cout << std::endl << "List constains 12: " << slist.contains(12) << std::endl;
+
+    for (int i = 0; i < 5000; ++i)
     {
-        foo fu;
-        algic::node<foo> nd(5, fu);
-        algic::skip_list<int, random<float>>  slist(randGen);
-
-        std::cout << std::endl << "List constains 12: " << slist.contains(12) << std::endl;
-
-        for (int i = 0; i < 5000; ++i)
-        {
-            int const rnd = std::rand();
-            slist.insert(rnd);
-        }
-        std::cout << std::endl << "Print list" << std::endl;
-
-        slist.print();
-
-        std::cout << std::endl << "List constains 12: " << slist.contains(12) << std::endl;
+        int const rnd = std::rand();
+        slist.insert(rnd);
     }
-    foo f;
+    std::cout << std::endl << "Print list" << std::endl;
+
+    slist.print();
+
+    std::cout << std::endl << "List constains 12: " << slist.contains(12) << std::endl;
+
     getchar();
     return 0;
 }
