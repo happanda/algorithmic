@@ -261,17 +261,28 @@ namespace algic
     bool skip_list<T, RandomGen>::contains(T const& t)
     {
         size_t const H = mHead->height();
-        for (size_t lvl = H - 1; lvl >= 0; --lvl)
+
+        node_base* curNode = mHead;
+        int curLvl = H - 1;
+        bool out = false;
+        while (!out)
         {
-            if (node_base* place = findPlace(t, H, lvl, mHead->next(lvl)))
+            auto nextNode = curNode->next(curLvl);
+            if (nextNode && less(nextNode, t))
             {
-                if (place->as<T>()->value() == t)
-                    return true;
-                else
-                    return false;
+                curNode = nextNode;
+                continue;
             }
-            if (lvl == 0)
-                break;
+            else if (curLvl >= 0)
+            {
+                --curLvl;
+                if (curLvl < 0)
+                {
+                    if (nextNode && eq(nextNode, t))
+                        return true;
+                    return false;
+                }
+            }
         }
         return false;
     }
