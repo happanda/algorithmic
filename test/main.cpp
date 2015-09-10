@@ -39,6 +39,7 @@ int main(int argc, char* argv[])
             slist.insert(rnd);
         }
         std::cout << std::endl << "Print list" << std::endl;
+
         slist.print();
 
         std::cout << std::endl << "List constains 12: " << slist.contains(12) << std::endl;

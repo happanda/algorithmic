@@ -193,7 +193,13 @@ namespace algic
     template <class T, class RandomGen>
     skip_list<T, RandomGen>::~skip_list()
     {
-        delete mHead;
+        node_base* curNode = mHead;
+        while (mHead)
+        {
+            mHead = mHead->next(0);
+            delete curNode;
+            curNode = mHead;
+        }
     }
 
     template <class T, class RandomGen>
@@ -255,6 +261,51 @@ namespace algic
     template <class T, class RandomGen>
     bool skip_list<T, RandomGen>::remove(T const& t)
     {
+        size_t const H = mHead->height();
+        if (H == 1 && !mHead->next(0))
+            return false;
+
+        std::vector<node_base*> visited(H, nullptr);
+
+        node_base* foundNode = nullptr;
+        node_base* curNode = mHead;
+        int curLvl = H - 1;
+        bool out = false;
+        while (!out)
+        {
+            auto nextNode = curNode->next(curLvl);
+            if (nextNode && less(nextNode, t))
+            {
+                curNode = nextNode;
+                continue;
+            }
+            else if (curLvl >= 0)
+            {
+                visited[curLvl] = curNode;
+                --curLvl;
+                if (curLvl < 0)
+                {
+                    if (nextNode && eq(nextNode, t))
+                    {
+                        foundNode = nextNode;
+                        out = true;
+                        break;
+                    }
+                    else
+                        return false;
+                }
+            }
+        }
+
+        if (!foundNode)
+            return false;
+        for (size_t i = 0; i < H; ++i)
+        {
+            if (visited[i] && visited[i]->next(i) == foundNode)
+                visited[i]->set(i, foundNode->next(i));
+        }
+        delete foundNode;
+        return true;
     }
 
     template <class T, class RandomGen>
