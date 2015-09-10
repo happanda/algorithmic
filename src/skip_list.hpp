@@ -334,31 +334,37 @@ namespace algic
     }
 
     template <class T, class RandomGen>
-    bool skip_list<T, RandomGen>::insert(T const& t)
+    typename skip_list<T, RandomGen>::pairib skip_list<T, RandomGen>::insert(T const& t)
+    {
+        return insert(std::move(T(t)));
+    }
+
+    template <class T, class RandomGen>
+    typename skip_list<T, RandomGen>::pairib skip_list<T, RandomGen>::insert(T&& t)
     {
         size_t const H = mHead->height();
-            // treat first element in a special way
+        // treat first element in a special way
         if (H == 1 && !mHead->next(0))
         {
-            node_base* newNode = new node<T>(1, t);
+            node_base* newNode = new node<T>(1, std::move(t));
             mHead->set(0, newNode);
-            return true;
+            return std::make_pair(iterator(this, newNode), true);
         }
 
         std::vector<node_base*> visited(H + 1, nullptr);
         if (visit(t, &visited)) // if already exists
-            return false;
+            return std::make_pair(end(), false);
 
-            // randomly choose the height of the new element
+        // randomly choose the height of the new element
         size_t const newLvl = multiCoin();
-        node_base* newNode = new node<T>(newLvl, t);
+        node_base* newNode = new node<T>(newLvl, std::move(t));
         if (newLvl > H)
         {
             mHead->incHeight();
             mHead->set(H, newNode);
         }
 
-            // reassign links
+        // reassign links
         size_t const minLvl = std::min(newLvl, H);
         for (size_t i = 0; i < minLvl; ++i)
         {
@@ -366,7 +372,7 @@ namespace algic
             visited[i]->set(i, newNode);
         }
         ++mSize;
-        return true;
+        return std::make_pair(iterator(this, newNode), true);
     }
 
     template <class T, class RandomGen>

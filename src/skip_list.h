@@ -50,6 +50,7 @@ namespace algic
         //typedef std::allocator_traits<Allocator>::pointer const_pointer;
         typedef slist_const_iterator<T> iterator;
         typedef slist_const_iterator<T> const_iterator;
+        typedef std::pair<iterator, bool> pairib;
 
         skip_list(RandomGen& randGen, float prob = 0.36787944117144f /* prob = 1 / e */);
         ~skip_list();
@@ -68,7 +69,8 @@ namespace algic
 
         void clear();
 
-        bool insert(T const& t);
+        pairib insert(T const& t);
+        pairib insert(T&& t);
         bool erase(T const& t);
         bool contains(T const& t);
         
