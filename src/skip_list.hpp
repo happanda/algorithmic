@@ -3,6 +3,8 @@
 #include <algorithm>
 #include <array>
 #include <cassert>
+#include <functional>
+#include <list>
 #include <vector>
 
 
@@ -53,6 +55,34 @@ namespace algic
 
         char mData[sizeof(T)];
     };
+
+    template <class T>
+    bool less(node_base* node, T const& val)
+    {
+        if (auto tNode = node->as<T>())
+            return std::less<T>()(tNode->value(), val);
+        else
+            return true;
+    }
+
+    template <class T>
+    bool eq(node_base* node, T const& val)
+    {
+        if (auto tNode = node->as<T>())
+            return std::equal_to<T>()(tNode->value(), val);
+        else
+            return false;
+    }
+
+    template <class T>
+    bool gt(node_base* node, T const& val)
+    {
+        if (auto tNode = node->as<T>())
+            return std::greater<T>()(tNode->value(), val);
+        else
+            return false;
+    }
+
 
 
     /**********************************************************/
@@ -168,6 +198,49 @@ namespace algic
     template <class T, class RandomGen>
     bool skip_list<T, RandomGen>::insert(T const& t)
     {
+        size_t const H = mHead->height();
+        std::vector<node_base*> visited(H, nullptr);
+
+        node_base* curNode = mHead;
+        int curLvl = H - 1;
+        bool out = false;
+        while (!out)
+        {
+            auto nextNode = curNode->next(curLvl);
+            if (nextNode && less(nextNode, t))
+            {
+                curNode = nextNode;
+                continue;
+            }
+            else if (curLvl >= 0)
+            {
+                visited[curLvl] = curNode;
+                --curLvl;
+                if (curLvl < 0)
+                {
+                    if (nextNode && eq(nextNode, t))
+                        return false;
+                    curLvl = 0;
+                    out = true;
+                    continue;
+                }
+            }
+        }
+
+        size_t const newLvl = multiCoin();
+        node_base* newNode = new node<T>(newLvl, t);
+        if (newLvl > H)
+        {
+            mHead->incHeight();
+            mHead->set(H, newNode);
+        }
+
+        for (size_t i = 0; i < H - 1; ++i)
+        {
+            newNode->set(i, visited[i]);
+            visited[i]->set(i, newNode);
+        }
+        return true;
     }
 
     template <class T, class RandomGen>
@@ -200,8 +273,7 @@ namespace algic
         if (!start)
             return nullptr;
         
-        auto const& val = start->as<T>()->value();
-        if (val < t)
+        if (less(start, t))
         {
             auto res = findPlace(t, height, level, start->next(level));
             if (!res)
@@ -212,7 +284,7 @@ namespace algic
                     return start;
             }
         }
-        if (val > t)
+        if (gt(start, t))
             return nullptr;
         return start;
     }
@@ -226,9 +298,14 @@ namespace algic
     template <class T, class RandomGen>
     size_t skip_list<T, RandomGen>::multiCoin() const
     {
+        size_t const maxH{ mHead->height() + 1 };
         size_t count{ 0 };
         while (mRand() < mProb)
+        {
             ++count;
+            if (count == maxH)
+                break;
+        }
         return count;
     }
 } // namespace algic
