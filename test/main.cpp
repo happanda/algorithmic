@@ -28,10 +28,11 @@ int main(int argc, char* argv[])
         foo fu;
         algic::node<foo> nd(5, fu);
         algic::skip_list<int, random<float>>  slist(randGen);
-        for (int i = 0; i < 5; ++i)
+        std::cout << slist.insert(2) << std::endl;
+        std::cout << slist.insert(1) << std::endl;
+        for (int i = 0; i < 5000; ++i)
         {
-            std::cout << slist.insert(i) << std::endl;
-            std::cout << slist.insert(5 - i) << std::endl;
+            std::cout << slist.insert(std::rand()) << std::endl;
         }
         std::cout << std::endl << "Print list" << std::endl;
         slist.print();

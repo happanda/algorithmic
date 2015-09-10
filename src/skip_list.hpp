@@ -207,7 +207,7 @@ namespace algic
             return true;
         }
 
-        std::vector<node_base*> visited(H, nullptr);
+        std::vector<node_base*> visited(H + 1, nullptr);
 
         node_base* curNode = mHead;
         int curLvl = H - 1;
@@ -243,7 +243,8 @@ namespace algic
             mHead->set(H, newNode);
         }
 
-        for (size_t i = 0; i < newLvl - 1; ++i)
+        size_t const minLvl = std::min(newLvl, H);
+        for (size_t i = 0; i < minLvl; ++i)
         {
             newNode->set(i, visited[i]->next(i));
             visited[i]->set(i, newNode);
