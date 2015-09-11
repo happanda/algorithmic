@@ -27,6 +27,7 @@ namespace algic
         void set(size_t level, node_base* nb);
 
         void incHeight();
+        void decHeight();
 
         template <class T>
         node<T>* as()
@@ -123,6 +124,17 @@ namespace algic
     void node_base::incHeight()
     {
         ++mHeight;
+        node_base** newLinks = new node_base*[mHeight];
+        std::copy(mLinks, mLinks + mHeight, newLinks);
+        delete mLinks;
+        mLinks = newLinks;
+        mLinks[mHeight - 1] = nullptr;
+    }
+
+    void node_base::decHeight()
+    {
+        assert(mHeight > 0 && "Decreasing zero height is illegal");
+        --mHeight;
         node_base** newLinks = new node_base*[mHeight];
         std::copy(mLinks, mLinks + mHeight, newLinks);
         delete mLinks;
@@ -392,8 +404,31 @@ namespace algic
     }
 
     template <class T, class RandomGen>
+    typename skip_list<T, RandomGen>::iterator skip_list<T, RandomGen>::erase(iterator pos)
+    {
+        if (pos == end())
+            return;
+        iterator next = pos;
+        ++next;
+        erase(pos.mNode->as<T>()->value());
+        return next;
+    }
+
+    template <class T, class RandomGen>
+    typename skip_list<T, RandomGen>::const_iterator skip_list<T, RandomGen>::erase(const_iterator pos)
+    {
+        if (pos == end())
+            return;
+        const_iterator next = pos;
+        ++next;
+        erase(pos.mNode->as<T>()->value());
+        return next;
+    }
+
+    template <class T, class RandomGen>
     bool skip_list<T, RandomGen>::erase(T const& t)
     {
+        size_t const H = mHead->height();
         std::vector<node_base*> visited(H, nullptr);
         if (node_base* foundNode = visit(t, &visited))
         {
@@ -406,6 +441,8 @@ namespace algic
             }
             delete foundNode;
             --mSize;
+            if (!mHead->next(H - 1))
+                mHead->decHeight();
             return true;
         }
         else

@@ -80,6 +80,9 @@ namespace algic
 
         void insert(std::initializer_list<value_type> ilist);
 
+        iterator erase(iterator pos);
+        const_iterator erase(const_iterator pos);
+
         bool erase(T const& t);
 
         bool contains(T const& t);
