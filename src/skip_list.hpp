@@ -248,6 +248,12 @@ namespace algic
         return mSlist != rhs.mSlist || mNode != rhs.mNode;
     }
 
+    template <class T>
+    template <class RandomGen>//, class Compare = std::less<Key>, class Allocator = std::allocator<T>>
+    slist_iterator<T>::slist_iterator(skip_list<T, RandomGen/*, Compare, Allocator*/> const* slist, node_base* node)
+        : slist_const_iterator(slist, node)
+    {
+    }
     
     /**********************************************************/
     /*                      skip_list                         */
@@ -295,7 +301,7 @@ namespace algic
     template <class T, class RandomGen>
     typename skip_list<T, RandomGen>::iterator skip_list<T, RandomGen>::end()
     {
-        return slist_const_iterator<T>(this, nullptr);
+        return slist_iterator<T>(this, nullptr);
     }
 
     template <class T, class RandomGen>
@@ -426,7 +432,7 @@ namespace algic
     }
 
     template <class T, class RandomGen>
-    bool skip_list<T, RandomGen>::erase(T const& t)
+    typename skip_list<T, RandomGen>::size_type skip_list<T, RandomGen>::erase(T const& t)
     {
         size_t const H = mHead->height();
         std::vector<node_base*> visited(H, nullptr);
@@ -443,10 +449,10 @@ namespace algic
             --mSize;
             if (!mHead->next(H - 1))
                 mHead->decHeight();
-            return true;
+            return 1;
         }
         else
-            return false;
+            return 0;
     }
 
     template <class T, class RandomGen>

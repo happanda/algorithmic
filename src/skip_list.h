@@ -32,6 +32,13 @@ namespace algic
         node_base* mNode;
     };
 
+    template <class T>
+    struct slist_iterator : public slist_const_iterator<T>
+    {
+        template <class RandomGen>//, class Compare = std::less<Key>, class Allocator = std::allocator<T>>
+        slist_iterator(skip_list<T, RandomGen/*, Compare, Allocator*/> const* slist, node_base* node);
+    };
+
 
     /**********************************************************/
     /*                     skip_list                          */
@@ -48,7 +55,7 @@ namespace algic
         typedef value_type const& const_reference;
         //typedef std::allocator_traits<Allocator>::pointer pointer;
         //typedef std::allocator_traits<Allocator>::pointer const_pointer;
-        typedef slist_const_iterator<T> iterator;
+        typedef slist_iterator<T> iterator;
         typedef slist_const_iterator<T> const_iterator;
         typedef std::pair<iterator, bool> pairib;
 
@@ -82,8 +89,7 @@ namespace algic
 
         iterator erase(iterator pos);
         const_iterator erase(const_iterator pos);
-
-        bool erase(T const& t);
+        size_type erase(T const& t);
 
         bool contains(T const& t);
         
