@@ -13,7 +13,7 @@ namespace algic
 {
     using std::size_t;
 
-    template <class T>
+    template <class Key>
     struct node;
 
 
@@ -29,10 +29,10 @@ namespace algic
         void incHeight();
         void decHeight();
 
-        template <class T>
-        node<T>* as()
+        template <class Key>
+        node<Key>* as()
         {
-            return dynamic_cast<node<T>*>(this);
+            return dynamic_cast<node<Key>*>(this);
         }
 
     private:
@@ -41,46 +41,46 @@ namespace algic
     };
 
 
-    template <class T>
+    template <class Key>
     struct node : public node_base
     {
-        node(size_t height, T const& t);
-        node(size_t height, T&& t);
+        node(size_t height, Key const& key);
+        node(size_t height, Key&& key);
         ~node();
 
-        T& value();
-        T const& value() const;
+        Key& value();
+        Key const& value() const;
 
     private:
-        T* asT();
-        T const* asT() const;
+        Key* asT();
+        Key const* asT() const;
 
-        char mData[sizeof(T)];
+        char mData[sizeof(Key)];
     };
 
-    template <class T>
-    bool less(node_base* node, T const& val)
+    template <class Key>
+    bool less(node_base* node, Key const& val)
     {
-        if (auto tNode = node->as<T>())
-            return std::less<T>()(tNode->value(), val);
+        if (auto tNode = node->as<Key>())
+            return std::less<Key>()(tNode->value(), val);
         else
             return true;
     }
 
-    template <class T>
-    bool eq(node_base* node, T const& val)
+    template <class Key>
+    bool eq(node_base* node, Key const& val)
     {
-        if (auto tNode = node->as<T>())
-            return std::equal_to<T>()(tNode->value(), val);
+        if (auto tNode = node->as<Key>())
+            return std::equal_to<Key>()(tNode->value(), val);
         else
             return false;
     }
 
-    template <class T>
-    bool gt(node_base* node, T const& val)
+    template <class Key>
+    bool gt(node_base* node, Key const& val)
     {
-        if (auto tNode = node->as<T>())
-            return std::greater<T>()(tNode->value(), val);
+        if (auto tNode = node->as<Key>())
+            return std::greater<Key>()(tNode->value(), val);
         else
             return false;
     }
@@ -145,112 +145,112 @@ namespace algic
 
     /**********************************************************/
     /*                         node                           */
-    template <class T>
-    node<T>::node(size_t height, T const& t)
+    template <class Key>
+    node<Key>::node(size_t height, Key const& key)
         : node_base(height)
     {
-        new (static_cast<void*>(mData))T(t);
+        new (static_cast<void*>(mData))Key(key);
     }
 
-    template <class T>
-    node<T>::node(size_t height, T&& t)
+    template <class Key>
+    node<Key>::node(size_t height, Key&& key)
         : node_base(height)
     {
-        new (static_cast<void*>(mData))T(std::move(t));
+        new (static_cast<void*>(mData))Key(std::move(key));
     }
 
-    template <class T>
-    node<T>::~node()
+    template <class Key>
+    node<Key>::~node()
     {
-        static_cast<T*>(static_cast<void*>(mData))->~T();
+        static_cast<Key*>(static_cast<void*>(mData))->~Key();
     }
 
-    template <class T>
-    T& node<T>::value()
+    template <class Key>
+    Key& node<Key>::value()
     {
-        return static_cast<T&>(*asT());
+        return static_cast<Key&>(*asT());
     }
 
-    template <class T>
-    T const& node<T>::value() const
+    template <class Key>
+    Key const& node<Key>::value() const
     {
-        return static_cast<T const&>(*asT());
+        return static_cast<Key const&>(*asT());
     }
 
-    template <class T>
-    T* node<T>::asT()
+    template <class Key>
+    Key* node<Key>::asT()
     {
-        return static_cast<T*>(static_cast<void*>(mData));
+        return static_cast<Key*>(static_cast<void*>(mData));
     }
 
-    template <class T>
-    T const* node<T>::asT() const
+    template <class Key>
+    Key const* node<Key>::asT() const
     {
-        return static_cast<T const*>(static_cast<void*>(mData));
+        return static_cast<Key const*>(static_cast<void*>(mData));
     }
 
 
     /**********************************************************/
     /*                 slist_const_iterator                   */
 
-    template <class T>
-    template <class RandomGen>//, class Compare = std::less<Key>, class Allocator = std::allocator<T>>
-    slist_const_iterator<T>::slist_const_iterator(skip_list<T, RandomGen/*, Compare, Allocator*/> const* slist, node_base* node)
+    template <class Key>
+    template <class RandomGen>//, class Compare = std::less<Key>, class Allocator = std::allocator<Key>>
+    slist_const_iterator<Key>::slist_const_iterator(skip_list<Key, RandomGen/*, Compare, Allocator*/> const* slist, node_base* node)
         : mSlist(static_cast<void const*>(slist))
         , mNode(node)
     {
     }
 
-    template <class T>
-    slist_const_iterator<T>::slist_const_iterator(slist_const_iterator const& rhs)
+    template <class Key>
+    slist_const_iterator<Key>::slist_const_iterator(slist_const_iterator const& rhs)
         : mSlist(rhs.mSlist)
         , mNode(rhs.mNode)
     {
     }
 
-    template <class T>
-    slist_const_iterator<T> const& slist_const_iterator<T>::operator=(slist_const_iterator const& rhs)
+    template <class Key>
+    slist_const_iterator<Key> const& slist_const_iterator<Key>::operator=(slist_const_iterator const& rhs)
     {
         mSlist = rhs.mSlist;
         mNode = rhs.mNode;
     }
 
-    template <class T>
-    T const& slist_const_iterator<T>::operator*() const
+    template <class Key>
+    Key const& slist_const_iterator<Key>::operator*() const
     {
-        return mNode->as<T>()->value();
+        return mNode->as<Key>()->value();
     }
 
-    template <class T>
-    slist_const_iterator<T>& slist_const_iterator<T>::operator++()
+    template <class Key>
+    slist_const_iterator<Key>& slist_const_iterator<Key>::operator++()
     {
         mNode = mNode->next(0);
         return *this;
     }
 
-    template <class T>
-    slist_const_iterator<T> slist_const_iterator<T>::operator++(int)
+    template <class Key>
+    slist_const_iterator<Key> slist_const_iterator<Key>::operator++(int)
     {
         auto prevIter = *this;
         mNode = mNode->next(0);
         return prevIter;
     }
 
-    template <class T>
-    bool slist_const_iterator<T>::operator==(slist_const_iterator const& rhs)
+    template <class Key>
+    bool slist_const_iterator<Key>::operator==(slist_const_iterator const& rhs)
     {
         return mSlist == rhs.mSlist && mNode == rhs.mNode;
     }
 
-    template <class T>
-    bool slist_const_iterator<T>::operator!=(slist_const_iterator const& rhs)
+    template <class Key>
+    bool slist_const_iterator<Key>::operator!=(slist_const_iterator const& rhs)
     {
         return mSlist != rhs.mSlist || mNode != rhs.mNode;
     }
 
-    template <class T>
-    template <class RandomGen>//, class Compare = std::less<Key>, class Allocator = std::allocator<T>>
-    slist_iterator<T>::slist_iterator(skip_list<T, RandomGen/*, Compare, Allocator*/> const* slist, node_base* node)
+    template <class Key>
+    template <class RandomGen>//, class Compare = std::less<Key>, class Allocator = std::allocator<Key>>
+    slist_iterator<Key>::slist_iterator(skip_list<Key, RandomGen/*, Compare, Allocator*/> const* slist, node_base* node)
         : slist_const_iterator(slist, node)
     {
     }
@@ -258,18 +258,18 @@ namespace algic
     /**********************************************************/
     /*                      skip_list                         */
 
-    template <class T, class RandomGen>
-    skip_list<T, RandomGen>::skip_list(RandomGen& randGen, float prob)
+    template <class Key, class RandomGen>
+    skip_list<Key, RandomGen>::skip_list(RandomGen& randGen, float prob)
         : mRand(randGen)
         , mHead(new node_base(1))
         , mProb(prob)
     {
-        assert(prob >= 0.0f && "Probability can't be negative");
+        assert(prob >= 0.0f && "Probability can'key be negative");
         assert(prob <= 1.0f && "Probability must be not greater than 1");
     }
 
-    template <class T, class RandomGen>
-    skip_list<T, RandomGen>::~skip_list()
+    template <class Key, class RandomGen>
+    skip_list<Key, RandomGen>::~skip_list()
     {
         node_base* curNode = mHead;
         while (mHead)
@@ -280,45 +280,45 @@ namespace algic
         }
     }
 
-    template <class T, class RandomGen>
-    typename skip_list<T, RandomGen>::iterator skip_list<T, RandomGen>::begin()
+    template <class Key, class RandomGen>
+    typename skip_list<Key, RandomGen>::iterator skip_list<Key, RandomGen>::begin()
     {
-        return slist_const_iterator<T>(this, mHead->next(0));
+        return slist_const_iterator<Key>(this, mHead->next(0));
     }
 
-    template <class T, class RandomGen>
-    typename skip_list<T, RandomGen>::const_iterator skip_list<T, RandomGen>::begin() const
+    template <class Key, class RandomGen>
+    typename skip_list<Key, RandomGen>::const_iterator skip_list<Key, RandomGen>::begin() const
     {
-        return slist_const_iterator<T>(this, mHead->next(0));
+        return slist_const_iterator<Key>(this, mHead->next(0));
     }
 
-    template <class T, class RandomGen>
-    typename skip_list<T, RandomGen>::const_iterator skip_list<T, RandomGen>::cbegin() const
+    template <class Key, class RandomGen>
+    typename skip_list<Key, RandomGen>::const_iterator skip_list<Key, RandomGen>::cbegin() const
     {
-        return slist_const_iterator<T>(this, mHead->next(0));
+        return slist_const_iterator<Key>(this, mHead->next(0));
     }
 
-    template <class T, class RandomGen>
-    typename skip_list<T, RandomGen>::iterator skip_list<T, RandomGen>::end()
+    template <class Key, class RandomGen>
+    typename skip_list<Key, RandomGen>::iterator skip_list<Key, RandomGen>::end()
     {
-        return slist_iterator<T>(this, nullptr);
+        return slist_iterator<Key>(this, nullptr);
     }
 
-    template <class T, class RandomGen>
-    typename skip_list<T, RandomGen>::const_iterator skip_list<T, RandomGen>::end() const
+    template <class Key, class RandomGen>
+    typename skip_list<Key, RandomGen>::const_iterator skip_list<Key, RandomGen>::end() const
     {
-        return slist_const_iterator<T>(this, nullptr);
+        return slist_const_iterator<Key>(this, nullptr);
     }
 
-    template <class T, class RandomGen>
-    typename skip_list<T, RandomGen>::const_iterator skip_list<T, RandomGen>::cend() const
+    template <class Key, class RandomGen>
+    typename skip_list<Key, RandomGen>::const_iterator skip_list<Key, RandomGen>::cend() const
     {
-        return slist_const_iterator<T>(this, nullptr);
+        return slist_const_iterator<Key>(this, nullptr);
     }
 
 
-    template <class T, class RandomGen>
-    void skip_list<T, RandomGen>::swap(skip_list& rhs)
+    template <class Key, class RandomGen>
+    void skip_list<Key, RandomGen>::swap(skip_list& rhs)
     {
         std::swap(mRand, rhs.mRand);
         std::swap(mProb, rhs.mProb);
@@ -326,20 +326,20 @@ namespace algic
         std::swap(mSize, rhs.mSize);
     }
 
-    template <class T, class RandomGen>
-    bool skip_list<T, RandomGen>::empty() const
+    template <class Key, class RandomGen>
+    bool skip_list<Key, RandomGen>::empty() const
     {
         return (mHead->next(0) == nullptr);
     }
 
-    template <class T, class RandomGen>
-    typename skip_list<T, RandomGen>::size_type skip_list<T, RandomGen>::size() const
+    template <class Key, class RandomGen>
+    typename skip_list<Key, RandomGen>::size_type skip_list<Key, RandomGen>::size() const
     {
         return mSize;
     }
 
-    template <class T, class RandomGen>
-    void skip_list<T, RandomGen>::clear()
+    template <class Key, class RandomGen>
+    void skip_list<Key, RandomGen>::clear()
     {
         node_base* curNode = mHead;
         while (mHead)
@@ -351,31 +351,31 @@ namespace algic
         mHead = new node_base(1);
     }
 
-    template <class T, class RandomGen>
-    typename skip_list<T, RandomGen>::pairib skip_list<T, RandomGen>::insert(T const& t)
+    template <class Key, class RandomGen>
+    typename skip_list<Key, RandomGen>::pairib skip_list<Key, RandomGen>::insert(Key const& key)
     {
-        return insert(std::move(T(t)));
+        return insert(std::move(Key(key)));
     }
 
-    template <class T, class RandomGen>
-    typename skip_list<T, RandomGen>::pairib skip_list<T, RandomGen>::insert(T&& t)
+    template <class Key, class RandomGen>
+    typename skip_list<Key, RandomGen>::pairib skip_list<Key, RandomGen>::insert(Key&& key)
     {
         size_t const H = mHead->height();
         // treat first element in a special way
         if (H == 1 && !mHead->next(0))
         {
-            node_base* newNode = new node<T>(1, std::move(t));
+            node_base* newNode = new node<Key>(1, std::move(key));
             mHead->set(0, newNode);
             return std::make_pair(iterator(this, newNode), true);
         }
 
         std::vector<node_base*> visited(H + 1, nullptr);
-        if (visit(t, &visited)) // if already exists
+        if (visit(key, &visited)) // if already exists
             return std::make_pair(end(), false);
 
         // randomly choose the height of the new element
         size_t const newLvl = multiCoin();
-        node_base* newNode = new node<T>(newLvl, std::move(t));
+        node_base* newNode = new node<Key>(newLvl, std::move(key));
         if (newLvl > H)
         {
             mHead->incHeight();
@@ -393,9 +393,9 @@ namespace algic
         return std::make_pair(iterator(this, newNode), true);
     }
 
-    template <class T, class RandomGen>
+    template <class Key, class RandomGen>
     template <class IterType>
-    void skip_list<T, RandomGen>::insert(IterType first, IterType last)
+    void skip_list<Key, RandomGen>::insert(IterType first, IterType last)
     {
         for (auto it = first; it != last; ++it)
         {
@@ -403,40 +403,40 @@ namespace algic
         }
     }
 
-    template <class T, class RandomGen>
-    void skip_list<T, RandomGen>::insert(std::initializer_list<value_type> ilist)
+    template <class Key, class RandomGen>
+    void skip_list<Key, RandomGen>::insert(std::initializer_list<value_type> ilist)
     {
         insert(std::cbegin(ilist), std::cend(ilist));
     }
 
-    template <class T, class RandomGen>
-    typename skip_list<T, RandomGen>::iterator skip_list<T, RandomGen>::erase(iterator pos)
+    template <class Key, class RandomGen>
+    typename skip_list<Key, RandomGen>::iterator skip_list<Key, RandomGen>::erase(iterator pos)
     {
         if (pos == end())
             return;
         iterator next = pos;
         ++next;
-        erase(pos.mNode->as<T>()->value());
+        erase(pos.mNode->as<Key>()->value());
         return next;
     }
 
-    template <class T, class RandomGen>
-    typename skip_list<T, RandomGen>::const_iterator skip_list<T, RandomGen>::erase(const_iterator pos)
+    template <class Key, class RandomGen>
+    typename skip_list<Key, RandomGen>::const_iterator skip_list<Key, RandomGen>::erase(const_iterator pos)
     {
         if (pos == end())
             return;
         const_iterator next = pos;
         ++next;
-        erase(pos.mNode->as<T>()->value());
+        erase(pos.mNode->as<Key>()->value());
         return next;
     }
 
-    template <class T, class RandomGen>
-    typename skip_list<T, RandomGen>::size_type skip_list<T, RandomGen>::erase(T const& t)
+    template <class Key, class RandomGen>
+    typename skip_list<Key, RandomGen>::size_type skip_list<Key, RandomGen>::erase(Key const& key)
     {
         size_t const H = mHead->height();
         std::vector<node_base*> visited(H, nullptr);
-        if (node_base* foundNode = visit(t, &visited))
+        if (node_base* foundNode = visit(key, &visited))
         {
                 // reassign links and delete the element
             size_t const H = mHead->height();
@@ -455,17 +455,94 @@ namespace algic
             return 0;
     }
 
-    template <class T, class RandomGen>
-    bool skip_list<T, RandomGen>::contains(T const& t)
+    template <class Key, class RandomGen>
+    typename skip_list<Key, RandomGen>::size_type skip_list<Key, RandomGen>::count(Key const& key)
     {
-        if (visit(t))
-            return true;
-        else
-            return false;
+        return visit(key) ? 1 : 0;
     }
 
-    template <class T, class RandomGen>
-    node_base* skip_list<T, RandomGen>::visit(T const& t, std::vector<node_base*>* visited)
+    template <class Key, class RandomGen>
+    typename skip_list<Key, RandomGen>::iterator skip_list<Key, RandomGen>::find(Key const& key)
+    {
+        auto node = visit(key);
+        return iterator(this, node);
+    }
+
+    template <class Key, class RandomGen>
+    typename skip_list<Key, RandomGen>::const_iterator skip_list<Key, RandomGen>::find(Key const& key) const
+    {
+        auto node = visit(key);
+        return const_iterator(this, node);
+    }
+
+    template <class Key, class RandomGen>
+    typename skip_list<Key, RandomGen>::pairit skip_list<Key, RandomGen>::equal_range(const Key& key)
+    {
+        auto found = visit(key, nullptr, false);
+        if (!found)
+            return std::make_pair(iterator(this, node), iterator(this, node));
+
+        auto nextNode = found->next(0);
+        if (less(found, key))
+            return std::make_pair(iterator(this, nextNode), iterator(this, nextNode));
+        else
+            return std::make_pair(iterator(this, found), iterator(this, nextNode));
+    }
+
+    template <class Key, class RandomGen>
+    typename skip_list<Key, RandomGen>::paircit skip_list<Key, RandomGen>::equal_range(const Key& key) const
+    {
+        auto found = visit(key, nullptr, false);
+        if (!found)
+            return std::make_pair(const_iterator(this, node), const_iterator(this, node));
+
+        auto nextNode = found->next(0);
+        if (less(found, key))
+            return std::make_pair(const_iterator(this, nextNode), const_iterator(this, nextNode));
+        else
+            return std::make_pair(const_iterator(this, found), const_iterator(this, nextNode));
+    }
+
+    template <class Key, class RandomGen>
+    typename skip_list<Key, RandomGen>::iterator skip_list<Key, RandomGen>::lower_bound(const Key& key)
+    {
+        auto found = visit(key, nullptr, false);
+        if (!found || !less(found, key)) // either not found, or found is equal
+            return iterator(this, found);
+        return iterator(this, found->next(0));
+    }
+
+    template <class Key, class RandomGen>
+    typename skip_list<Key, RandomGen>::const_iterator skip_list<Key, RandomGen>::lower_bound(const Key& key) const
+    {
+        auto found = visit(key, nullptr, false);
+        if (!found || !less(found, key)) // either not found, or found is equal
+            return const_iterator(this, found);
+        return const_iterator(this, found->next(0));
+    }
+
+    template <class Key, class RandomGen>
+    typename skip_list<Key, RandomGen>::iterator skip_list<Key, RandomGen>::upper_bound(const Key& key)
+    {
+        auto found = visit(key, nullptr, false);
+        return found ? iterator(this, found->next(0)) : iterator(this, found);
+    }
+
+    template <class Key, class RandomGen>
+    typename skip_list<Key, RandomGen>::const_iterator skip_list<Key, RandomGen>::upper_bound(const Key& key) const
+    {
+        auto found = visit(key, nullptr, false);
+        return found ? const_iterator(this, found->next(0)) : const_iterator(this, found);
+    }
+
+    template <class Key, class RandomGen>
+    bool skip_list<Key, RandomGen>::contains(Key const& key)
+    {
+        return count(key) == 1;
+    }
+
+    template <class Key, class RandomGen>
+    node_base* skip_list<Key, RandomGen>::visit(Key const& key, std::vector<node_base*>* visited, bool returnEqOnly) const
     {
         size_t const H = mHead->height();
         if (H == 1 && !mHead->next(0))
@@ -478,7 +555,7 @@ namespace algic
         while (!out)
         {
             auto nextNode = curNode->next(curLvl);
-            if (nextNode && less(nextNode, t))
+            if (nextNode && less(nextNode, key))
             {
                 curNode = nextNode;
                 continue;
@@ -490,10 +567,11 @@ namespace algic
                 --curLvl;
                 if (curLvl < 0)
                 {
-                    if (nextNode && eq(nextNode, t))
+                    if (nextNode && eq(nextNode, key))
                         return nextNode;
-                    else
+                    else if (returnEqOnly)
                         return nullptr;
+                    return curNode;
                 }
             }
         }
@@ -501,14 +579,14 @@ namespace algic
         return nullptr;
     }
 
-    template <class T, class RandomGen>
-    bool skip_list<T, RandomGen>::coin() const
+    template <class Key, class RandomGen>
+    bool skip_list<Key, RandomGen>::coin() const
     {
         return mRand() < mProb;
     }
 
-    template <class T, class RandomGen>
-    size_t skip_list<T, RandomGen>::multiCoin() const
+    template <class Key, class RandomGen>
+    size_t skip_list<Key, RandomGen>::multiCoin() const
     {
         size_t const maxH{ mHead->height() + 1 };
         size_t count{ 1 };
