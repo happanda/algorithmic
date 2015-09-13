@@ -31,6 +31,18 @@ struct SkipListFixture : public ::testing::Test
         }
     }
 
+    void fillRandomlyRange(size_t count)
+    {
+        std::list<int> listInt;
+        for (size_t i = 0; i < count; ++i)
+        {
+            int const num = mRand();
+            listInt.push_back(num);
+        }
+        mSList1.insert(std::cbegin(listInt), std::cend(listInt));
+        mSet1.insert(std::cbegin(listInt), std::cend(listInt));
+    }
+
     random<int>  mRand;
     skip_list<int, random<float>>  mSList1;
     skip_list<int, random<float>>  mSList2;
@@ -149,7 +161,6 @@ TEST_F(SkipListFixture, Swap)
     compare(mSet2, mSList1);
 }
 
-
 TEST_F(SkipListFixture, ClearEmpty)
 {
     for (int i = 0; i < 100; ++i)
@@ -164,6 +175,19 @@ TEST_F(SkipListFixture, ClearEmpty)
     }
     EXPECT_TRUE(mSList1.empty());
     EXPECT_TRUE(mSList2.empty());
+}
+
+TEST_F(SkipListFixture, FillRange)
+{
+    fillRandomlyRange(100);
+    compareSize(mSet1, mSList1);
+    compare(mSet1, mSList1);
+
+    std::swap(mSList1, mSList2);
+    compareSize(mSet1, mSList2);
+    compareSize(mSet2, mSList1);
+    compare(mSet1, mSList2);
+    compare(mSet2, mSList1);
 }
 
 #endif
