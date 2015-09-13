@@ -264,8 +264,10 @@ namespace algic
         , mHead(new node_base(1))
         , mProb(prob)
     {
-        assert(prob >= 0.0f && "Probability can'key be negative");
-        assert(prob <= 1.0f && "Probability must be not greater than 1");
+        //assert(prob >= 0.0f && "Probability can'key be negative");
+        //assert(prob <= 1.0f && "Probability must be not greater than 1");
+        if (prob < 0.0f || prob > 1.0f)
+            throw std::invalid_argument("Probabiliry must be in [0, 1] range");
     }
 
     template <class Key, class RandomGen>
@@ -283,7 +285,7 @@ namespace algic
     template <class Key, class RandomGen>
     typename skip_list<Key, RandomGen>::iterator skip_list<Key, RandomGen>::begin()
     {
-        return slist_const_iterator<Key>(this, mHead->next(0));
+        return slist_iterator<Key>(this, mHead->next(0));
     }
 
     template <class Key, class RandomGen>
@@ -366,6 +368,7 @@ namespace algic
         {
             node_base* newNode = new node<Key>(1, std::move(key));
             mHead->set(0, newNode);
+            ++mSize;
             return std::make_pair(iterator(this, newNode), true);
         }
 
@@ -449,6 +452,7 @@ namespace algic
             --mSize;
             if (!mHead->next(H - 1))
                 mHead->decHeight();
+            --mSize;
             return 1;
         }
         else

@@ -22,8 +22,8 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_SOURCE_DIR}/build)
 include(CMakeSrc.cmake)
 
 add_executable(Test ${SOURCE_FILES})
-#target_link_libraries(Test debug ${LibPath}/gtestd${CMAKE_FIND_LIBRARY_SUFFIXES})
-#target_link_libraries(Test optimized ${LibPath}/gtest${CMAKE_FIND_LIBRARY_SUFFIXES})
+target_link_libraries(Test debug ${LibPath}/gtestd${CMAKE_FIND_LIBRARY_SUFFIXES})
+target_link_libraries(Test optimized ${LibPath}/gtest${CMAKE_FIND_LIBRARY_SUFFIXES})
 
 # create output directory
 add_custom_command(TARGET Test PRE_BUILD

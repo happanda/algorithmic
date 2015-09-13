@@ -7,6 +7,7 @@ ${SourcePath}/random.h
 
 set(SOURCE_FILES_TEST
 ${TestPath}/main.cpp
+${TestPath}/tests.h
 )
 
 # set appropriate source groups
