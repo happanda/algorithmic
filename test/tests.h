@@ -188,6 +188,14 @@ TEST_F(SkipListFixture, FillRange)
     compareSize(mSet2, mSList1);
     compare(mSet1, mSList2);
     compare(mSet2, mSList1);
+
+    mSList1.clear();
+    mSet1.clear();
+    auto initList = { 1, 2, 3, 4, 5, 12, -1 };
+    mSList1.insert(initList);
+    mSet1.insert(initList);
+    compareSize(mSet1, mSList1);
+    compare(mSet1, mSList1);
 }
 
 #endif
