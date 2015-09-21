@@ -1,6 +1,7 @@
 #ifndef INCLUDE_TESTS_H
 #define INCLUDE_TESTS_H
 
+#include <stdexcept>
 #include <string>
 #include <gtest/gtest.h>
 #include "random.h"
@@ -41,6 +42,14 @@ struct SkipListFixture : public ::testing::Test
         }
         mSList1.insert(std::cbegin(listInt), std::cend(listInt));
         mSet1.insert(std::cbegin(listInt), std::cend(listInt));
+    }
+
+    void clear()
+    {
+        mSList1.clear();
+        mSList2.clear();
+        mSet1.clear();
+        mSet2.clear();
     }
 
     random<int>  mRand;
@@ -196,6 +205,43 @@ TEST_F(SkipListFixture, FillRange)
     mSet1.insert(initList);
     compareSize(mSet1, mSList1);
     compare(mSet1, mSList1);
+}
+
+TEST_F(SkipListFixture, Erase)
+{
+    for (int i = 0; i < 100; ++i)
+    {
+        fillRandomly(100);
+        {
+            skip_list<int, random<float>>::iterator slIt = std::begin(mSList1);
+            while (!mSList1.empty())
+            {
+                slIt = mSList1.erase(slIt);
+            }
+            EXPECT_TRUE(mSList1.empty());
+            EXPECT_EQ(0, mSList1.size());
+        }
+        clear();
+    }
+}
+
+TEST_F(SkipListFixture, EraseRandomly)
+{
+    for (int i = 0; i < 100; ++i)
+    {
+        fillRandomly(500);
+
+        std::vector<int> vect;
+        std::copy(std::cbegin(mSList1), std::cend(mSList1), std::back_inserter(vect));
+
+        while (!vect.empty())
+        {
+            int const idx = mRand() % vect.size();
+            mSList1.erase(vect[idx]);
+            vect.erase((std::cbegin(vect) + idx));
+            EXPECT_EQ(vect.size(), mSList1.size());
+        }
+    }
 }
 
 #endif

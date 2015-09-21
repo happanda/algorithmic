@@ -139,7 +139,6 @@ namespace algic
         std::copy(mLinks, mLinks + mHeight, newLinks);
         delete mLinks;
         mLinks = newLinks;
-        mLinks[mHeight - 1] = nullptr;
     }
     
 
@@ -213,6 +212,7 @@ namespace algic
     {
         mSlist = rhs.mSlist;
         mNode = rhs.mNode;
+        return *this;
     }
 
     template <class Key>
@@ -351,6 +351,7 @@ namespace algic
             curNode = mHead;
         }
         mHead = new node_base(1);
+        mSize = 0;
     }
 
     template <class Key, class RandomGen>
@@ -416,10 +417,10 @@ namespace algic
     typename skip_list<Key, RandomGen>::iterator skip_list<Key, RandomGen>::erase(iterator pos)
     {
         if (pos == end())
-            return;
+            return end();
         iterator next = pos;
         ++next;
-        erase(pos.mNode->as<Key>()->value());
+        erase(*pos);
         return next;
     }
 
@@ -427,10 +428,10 @@ namespace algic
     typename skip_list<Key, RandomGen>::const_iterator skip_list<Key, RandomGen>::erase(const_iterator pos)
     {
         if (pos == end())
-            return;
+            return cend();
         const_iterator next = pos;
         ++next;
-        erase(pos.mNode->as<Key>()->value());
+        erase(*pos);
         return next;
     }
 
@@ -450,9 +451,8 @@ namespace algic
             }
             delete foundNode;
             --mSize;
-            if (!mHead->next(H - 1))
+            if (!mHead->next(H - 1) && H > 1)
                 mHead->decHeight();
-            --mSize;
             return 1;
         }
         else

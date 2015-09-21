@@ -13,6 +13,13 @@ namespace algic
     template <class Key>
     struct slist_const_iterator
     {
+        typedef std::forward_iterator_tag  iterator_category;
+        typedef Key  value_type;
+        typedef std::ptrdiff_t  difference_type;
+        typedef difference_type distance_type;	// retained
+        typedef std::remove_cv_t<Key>*  pointer;
+        typedef std::remove_cv_t<Key>&  reference;
+
         // NOTE: no destructor, cause there's no need in special destructing procedure
         // and the only descendant slist_iterator has no data
 
