@@ -237,13 +237,25 @@ namespace algic
     }
 
     template <class Key>
-    bool slist_const_iterator<Key>::operator==(slist_const_iterator const& rhs)
+    bool slist_const_iterator<Key>::operator==(slist_const_iterator const& rhs) const
     {
         return mSlist == rhs.mSlist && mNode == rhs.mNode;
     }
 
     template <class Key>
-    bool slist_const_iterator<Key>::operator!=(slist_const_iterator const& rhs)
+    bool slist_const_iterator<Key>::operator!=(slist_const_iterator const& rhs) const
+    {
+        return mSlist != rhs.mSlist || mNode != rhs.mNode;
+    }
+
+    template <class Key>
+    bool slist_const_iterator<Key>::operator==(slist_iterator<Key> const& rhs) const
+    {
+        return mSlist == rhs.mSlist && mNode == rhs.mNode;
+    }
+
+    template <class Key>
+    bool slist_const_iterator<Key>::operator!=(slist_iterator<Key> const& rhs) const
     {
         return mSlist != rhs.mSlist || mNode != rhs.mNode;
     }

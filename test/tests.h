@@ -244,4 +244,41 @@ TEST_F(SkipListFixture, EraseRandomly)
     }
 }
 
+TEST_F(SkipListFixture, CountIsZeroOrOne)
+{
+    for (int i = 0; i < 100; ++i)
+    {
+        fillRandomly(500);
+
+        int const num = mRand();
+        int const count = mSList1.count(num);
+        bool const contains = mSList1.contains(num);
+        EXPECT_TRUE(count == 0 || count == 1);
+        EXPECT_TRUE((contains && count == 1) || (!contains && count == 0));
+    }
+}
+
+TEST_F(SkipListFixture, Find)
+{
+    for (int i = 1; i < 100; ++i)
+    {
+        for (int j = 0; j < i; ++j)
+        {
+            int num = mRand();
+            while (mSet1.find(num) != std::cend(mSet1))
+                num = mRand();
+            mSList1.insert(num);
+            mSet1.insert(num);
+        }
+
+        for (auto num : mSet1)
+        {
+            skip_list<int, random<float>>::iterator slIt = mSList1.find(num);
+            skip_list<int, random<float>>::const_iterator slcIt = mSList1.find(num);
+            EXPECT_NE(slIt, std::end(mSList1));
+            EXPECT_NE(slcIt, std::cend(mSList1));
+        }
+    }
+}
+
 #endif

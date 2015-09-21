@@ -11,6 +11,9 @@ namespace algic
     struct skip_list;
     
     template <class Key>
+    struct slist_iterator;
+
+    template <class Key>
     struct slist_const_iterator
     {
         typedef std::forward_iterator_tag  iterator_category;
@@ -35,8 +38,10 @@ namespace algic
         slist_const_iterator& operator++();
         slist_const_iterator operator++(int);
 
-        bool operator==(slist_const_iterator const& rhs);
-        bool operator!=(slist_const_iterator const& rhs);
+        bool operator==(slist_const_iterator const& rhs) const;
+        bool operator!=(slist_const_iterator const& rhs) const;
+        bool operator==(slist_iterator<Key> const& rhs) const;
+        bool operator!=(slist_iterator<Key> const& rhs) const;
 
     private:
         void const* mSlist;
