@@ -496,7 +496,7 @@ namespace algic
     {
         auto found = visit(key, nullptr, false);
         if (!found)
-            return std::make_pair(iterator(this, node), iterator(this, node));
+            return std::make_pair(iterator(this, found), iterator(this, found));
 
         auto nextNode = found->next(0);
         if (less(found, key))

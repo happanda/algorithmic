@@ -19,11 +19,11 @@ struct SkipListFixture : public ::testing::Test
     {
     }
 
-    void fillRandomly(size_t count)
+    void fillRandomly(size_t count, int mod = std::numeric_limits<int>::max())
     {
         for (size_t i = 0; i < count; ++i)
         {
-            int num = mRand();
+            int num = mRand() % mod;
             mSList1.insert(num);
             mSet1.insert(num);
             num = mRand();
@@ -278,6 +278,34 @@ TEST_F(SkipListFixture, Find)
             EXPECT_NE(slIt, std::end(mSList1));
             EXPECT_NE(slcIt, std::cend(mSList1));
         }
+    }
+}
+
+TEST_F(SkipListFixture, EqualRange)
+{
+    fillRandomly(1000, 10000);
+    int forExisting = 0;
+    int forNonExist = 0;
+
+    int i = 0;
+    while (forExisting < 10 || forNonExist < 10)
+    {
+        auto eqRange = mSList1.equal_range(i);
+        if (eqRange.first != std::end(mSList1))
+            EXPECT_GE(*(eqRange.first), i);
+
+        bool contains = mSList1.contains(i);
+        if (contains)
+        {
+            EXPECT_EQ(i, *(eqRange.first));
+            ++forExisting;
+        }
+        else
+        {
+            EXPECT_EQ(eqRange.first, eqRange.second);
+            ++forNonExist;
+        }
+        ++i;
     }
 }
 
