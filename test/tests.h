@@ -309,4 +309,88 @@ TEST_F(SkipListFixture, EqualRange)
     }
 }
 
+TEST_F(SkipListFixture, LowerBound)
+{
+    fillRandomly(1000, 10000);
+    for (int i = 0; i < 10000; ++i)
+    {
+        int const num = mRand() % 10000;
+        auto lwS = mSet1.lower_bound(num);
+        skip_list<int, random<float>>::iterator lwL = mSList1.lower_bound(num);
+        if (lwS == std::end(mSet1))
+            EXPECT_EQ(std::end(mSList1), lwL);
+        else
+            EXPECT_EQ(*lwS, *lwL);
+
+        auto upS = mSet1.lower_bound(num);
+        skip_list<int, random<float>>::iterator upL = mSList1.lower_bound(num);
+        if (upS == std::end(mSet1))
+            EXPECT_EQ(std::end(mSList1), upL);
+        else
+            EXPECT_EQ(*upS, *upL);
+    }
+
+    clear();
+    fillRandomly(1000, 10000);
+    for (int i = 0; i < 10000; ++i)
+    {
+        int const num = mRand() % 10000;
+        auto lwS = mSet1.lower_bound(num);
+        algic::skip_list<int, random<float>>::const_iterator lwL = mSList1.lower_bound(num);
+        if (lwS == std::end(mSet1))
+            EXPECT_EQ(std::end(mSList1), lwL);
+        else
+            EXPECT_EQ(*lwS, *lwL);
+
+        auto upS = mSet1.lower_bound(num);
+        algic::skip_list<int, random<float>>::const_iterator upL = mSList1.lower_bound(num);
+        if (upS == std::end(mSet1))
+            EXPECT_EQ(std::end(mSList1), upL);
+        else
+            EXPECT_EQ(*upS, *upL);
+    }
+}
+
+TEST_F(SkipListFixture, UpperBound)
+{
+    fillRandomly(1000, 10000);
+    for (int i = 0; i < 10000; ++i)
+    {
+        int const num = mRand() % 10000;
+        auto lwS = mSet1.upper_bound(num);
+        skip_list<int, random<float>>::iterator lwL = mSList1.upper_bound(num);
+        if (lwS == std::end(mSet1))
+            EXPECT_EQ(std::end(mSList1), lwL);
+        else
+            EXPECT_EQ(*lwS, *lwL);
+
+        auto upS = mSet1.upper_bound(num);
+        skip_list<int, random<float>>::iterator upL = mSList1.upper_bound(num);
+        if (upS == std::end(mSet1))
+            EXPECT_EQ(std::end(mSList1), upL);
+        else
+            EXPECT_EQ(*upS, *upL);
+    }
+
+    clear();
+    fillRandomly(1000, 10000);
+    for (int i = 0; i < 10000; ++i)
+    {
+        int const num = mRand() % 10000;
+        auto lwS = mSet1.upper_bound(num);
+        algic::skip_list<int, random<float>>::const_iterator lwL = mSList1.upper_bound(num);
+        if (lwS == std::end(mSet1))
+            EXPECT_EQ(std::end(mSList1), lwL);
+        else
+            EXPECT_EQ(*lwS, *lwL);
+
+        auto upS = mSet1.upper_bound(num);
+        algic::skip_list<int, random<float>>::const_iterator upL = mSList1.upper_bound(num);
+        if (upS == std::end(mSet1))
+            EXPECT_EQ(std::end(mSList1), upL);
+        else
+            EXPECT_EQ(*upS, *upL);
+    }
+}
+
 #endif
