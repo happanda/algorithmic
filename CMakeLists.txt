@@ -4,6 +4,7 @@ project(Algorithmic)
 # useful variables
 set(SourcePath ${PROJECT_SOURCE_DIR}/src)
 set(TestPath ${PROJECT_SOURCE_DIR}/test)
+set(BenchPath ${PROJECT_SOURCE_DIR}/bench)
 set(LibPath ${PROJECT_SOURCE_DIR}/lib)
 
 # include directories
@@ -21,10 +22,19 @@ set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_SOURCE_DIR}/build)
 
 include(CMakeSrc.cmake)
 
-add_executable(Test ${SOURCE_FILES})
+### TEST ###
+add_executable(Test ${SOURCE_FILES_TEST_PROJ})
 target_link_libraries(Test debug ${LibPath}/gtestd${CMAKE_FIND_LIBRARY_SUFFIXES})
 target_link_libraries(Test optimized ${LibPath}/gtest${CMAKE_FIND_LIBRARY_SUFFIXES})
 
 # create output directory
 add_custom_command(TARGET Test PRE_BUILD
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
+
+
+### BENCHMARK ###
+add_executable(Benchmark ${SOURCE_FILES_BENCH_PROJ})
+
+# create output directory
+add_custom_command(TARGET Benchmark PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_RUNTIME_OUTPUT_DIRECTORY})
