@@ -1,2 +1,5 @@
 # algorithmic
-Implementing data structures and algorithms.
+Data structures and algorithms.
+
+Currently implemented:
+- skip list (randomized)
