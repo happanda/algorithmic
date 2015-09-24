@@ -1,4 +1,5 @@
 #include <chrono>
+#include <iomanip>
 #include <iostream>
 #include <set>
 #include <string>
@@ -15,20 +16,21 @@ using std::chrono::high_resolution_clock;
 
 
 void fillRandomStr(size_t count);
-void fillRandomInt(size_t count);
+void fillSeqInt(size_t count);
 void benchFill();
 void benchFillRange();
 void benchFillAsc();
 void benchFillDesc();
+void benchFind();
 
 
 /*********** MAIN ***********/
 int main(int argc, char* argv[])
 {
     //benchFill();
-    //benchFillRange();
-    benchFillAsc();
-    benchFillDesc();
+    //benchFillAsc();
+    //benchFillDesc();
+    benchFind();
 
     sVect.clear();
     sVectInts.clear();
@@ -56,7 +58,7 @@ void fillRandomStr(size_t count)
     }
 }
 
-void fillRandomInt(size_t count)
+void fillSeqInt(size_t count)
 {
     sVectInts.clear();
     for (int i = 0; i < count; ++i)
@@ -67,10 +69,13 @@ void fillRandomInt(size_t count)
 
 void benchFill()
 {
-    std::cout << "\n\nBENCH FILL" << std::endl;
+    std::cout << "\n\nBENCH FILL\t";
+    std::vector<std::pair<double, double>> timesFill;
+    std::vector<std::pair<double, double>> timesErase;
+
     for (int c = 1; c <= 100000; c *= 10)
     {
-        std::cout << std::endl << "Number of elements: " << c << std::endl;
+        std::cout << c << " ";
         fillRandomStr(c);
         {
             std::set<std::string>  set;
@@ -81,7 +86,7 @@ void benchFill()
             }
             auto tpFinish = high_resolution_clock::now();
             std::chrono::duration<double> diff = tpFinish - tpStart;
-            std::cout << "  Set fill in " << diff.count() << std::endl;
+            timesFill.push_back(std::make_pair(diff.count(), 0.0));
 
             tpStart = high_resolution_clock::now();
             for (auto const& v : sVect)
@@ -90,7 +95,7 @@ void benchFill()
             }
             tpFinish = high_resolution_clock::now();
             diff = tpFinish - tpStart;
-            std::cout << "  Set erase in " << diff.count() << std::endl;
+            timesErase.push_back(std::make_pair(diff.count(), 0.0));
         }
 
         {
@@ -103,7 +108,7 @@ void benchFill()
             }
             auto tpFinish = high_resolution_clock::now();
             std::chrono::duration<double> diff = tpFinish - tpStart;
-            std::cout << "  SkipList fill in " << diff.count() << std::endl;
+            timesFill.back().second = diff.count();
 
             tpStart = high_resolution_clock::now();
             for (auto const& v : sVect)
@@ -112,64 +117,29 @@ void benchFill()
             }
             tpFinish = high_resolution_clock::now();
             diff = tpFinish - tpStart;
-            std::cout << "  SkipList erase in " << diff.count() << std::endl;
+            timesErase.back().second = diff.count();
         }
     }
-}
 
-void benchFillRange()
-{
-    std::cout << "\n\nBENCH FILL RANGE" << std::endl;
-    for (int c = 1; c <= 100000; c *= 10)
-    {
-        std::cout << std::endl << "Number of elements: " << c << std::endl;
-        fillRandomStr(c);
-        {
-            std::set<std::string>  set;
-            auto tpStart = high_resolution_clock::now();
-            set.insert(std::cbegin(sVect), std::cend(sVect));
-            auto tpFinish = high_resolution_clock::now();
-            std::chrono::duration<double> diff = tpFinish - tpStart;
-            std::cout << "  Set fill in " << diff.count() << std::endl;
-
-            tpStart = high_resolution_clock::now();
-            for (auto const& v : sVect)
-            {
-                set.erase(v);
-            }
-            tpFinish = high_resolution_clock::now();
-            diff = tpFinish - tpStart;
-            std::cout << "  Set erase in " << diff.count() << std::endl;
-        }
-
-        {
-            random<float> floatRand;
-            algic::skip_list<std::string, random<float>>  sl(floatRand);
-            auto tpStart = high_resolution_clock::now();
-            sl.insert(std::cbegin(sVect), std::cend(sVect));
-            auto tpFinish = high_resolution_clock::now();
-            std::chrono::duration<double> diff = tpFinish - tpStart;
-            std::cout << "  SkipList fill in " << diff.count() << std::endl;
-
-            tpStart = high_resolution_clock::now();
-            for (auto const& v : sVect)
-            {
-                sl.erase(v);
-            }
-            tpFinish = high_resolution_clock::now();
-            diff = tpFinish - tpStart;
-            std::cout << "  SkipList erase in " << diff.count() << std::endl;
-        }
-    }
+    std::cout << "\n  Fill times for 1, 10, 100, ... elements:\n  ";
+    for (auto const& t : timesFill)
+        std::cout << std::setprecision(4) << t.first << ",\t";
+    std::cout << "\n  ";
+    for (auto const& t : timesFill)
+        std::cout << std::setprecision(4) << t.second << ",\t";
+    std::cout << std::endl;
 }
 
 void benchFillAsc()
 {
-    std::cout << "\n\nBENCH FILL ASCENDING" << std::endl;
+    std::cout << "\n\nBENCH FILL ASCENDING\t";
+    std::vector<std::pair<double, double>> timesFill;
+    std::vector<std::pair<double, double>> timesErase;
+
     for (int c = 1; c <= 100000; c *= 10)
     {
-        std::cout << std::endl << "Number of elements: " << c << std::endl;
-        fillRandomInt(c);
+        std::cout << c << " ";
+        fillSeqInt(c);
         {
             std::set<int>  set;
             auto tpStart = high_resolution_clock::now();
@@ -179,7 +149,7 @@ void benchFillAsc()
             }
             auto tpFinish = high_resolution_clock::now();
             std::chrono::duration<double> diff = tpFinish - tpStart;
-            std::cout << "  Set fill in " << diff.count() << std::endl;
+            timesFill.push_back(std::make_pair(diff.count(), 0.0));
 
             tpStart = high_resolution_clock::now();
             for (auto const& v : sVectInts)
@@ -188,7 +158,7 @@ void benchFillAsc()
             }
             tpFinish = high_resolution_clock::now();
             diff = tpFinish - tpStart;
-            std::cout << "  Set erase in " << diff.count() << std::endl;
+            timesErase.push_back(std::make_pair(diff.count(), 0.0));
         }
 
         {
@@ -201,7 +171,7 @@ void benchFillAsc()
             }
             auto tpFinish = high_resolution_clock::now();
             std::chrono::duration<double> diff = tpFinish - tpStart;
-            std::cout << "  SkipList fill in " << diff.count() << std::endl;
+            timesFill.back().second = diff.count();
 
             tpStart = high_resolution_clock::now();
             for (auto const& v : sVectInts)
@@ -210,18 +180,29 @@ void benchFillAsc()
             }
             tpFinish = high_resolution_clock::now();
             diff = tpFinish - tpStart;
-            std::cout << "  SkipList erase in " << diff.count() << std::endl;
+            timesErase.back().second = diff.count();
         }
     }
+
+    std::cout << "\n  Fill times for 1, 10, 100, ... elements:\n  ";
+    for (auto const& t : timesFill)
+        std::cout << std::setprecision(4) << t.first << ",\t";
+    std::cout << "\n  ";
+    for (auto const& t : timesFill)
+        std::cout << std::setprecision(4) << t.second << ",\t";
+    std::cout << std::endl;
 }
 
 void benchFillDesc()
 {
-    std::cout << "\n\nBENCH FILL DESCENDING" << std::endl;
+    std::cout << "\n\nBENCH FILL DESCENDING\t";
+    std::vector<std::pair<double, double>> timesFill;
+    std::vector<std::pair<double, double>> timesErase;
+
     for (int c = 1; c <= 100000; c *= 10)
     {
-        std::cout << std::endl << "Number of elements: " << c << std::endl;
-        fillRandomInt(c);
+        std::cout << c << " ";
+        fillSeqInt(c);
         {
             std::set<int>  set;
             auto tpStart = high_resolution_clock::now();
@@ -231,7 +212,7 @@ void benchFillDesc()
             }
             auto tpFinish = high_resolution_clock::now();
             std::chrono::duration<double> diff = tpFinish - tpStart;
-            std::cout << "  Set fill in " << diff.count() << std::endl;
+            timesFill.push_back(std::make_pair(diff.count(), 0.0));
 
             tpStart = high_resolution_clock::now();
             for (auto v = std::crbegin(sVectInts); v != std::crend(sVectInts); ++v)
@@ -240,7 +221,7 @@ void benchFillDesc()
             }
             tpFinish = high_resolution_clock::now();
             diff = tpFinish - tpStart;
-            std::cout << "  Set erase in " << diff.count() << std::endl;
+            timesErase.push_back(std::make_pair(diff.count(), 0.0));
         }
 
         {
@@ -253,7 +234,7 @@ void benchFillDesc()
             }
             auto tpFinish = high_resolution_clock::now();
             std::chrono::duration<double> diff = tpFinish - tpStart;
-            std::cout << "  SkipList fill in " << diff.count() << std::endl;
+            timesFill.back().second = diff.count();
 
             tpStart = high_resolution_clock::now();
             for (auto v = std::crbegin(sVectInts); v != std::crend(sVectInts); ++v)
@@ -262,7 +243,69 @@ void benchFillDesc()
             }
             tpFinish = high_resolution_clock::now();
             diff = tpFinish - tpStart;
-            std::cout << "  SkipList erase in " << diff.count() << std::endl;
+            timesErase.back().second = diff.count();
         }
     }
+
+    std::cout << "\n  Fill times for 1, 10, 100, ... elements:\n\t";
+    for (auto const& t : timesFill)
+        std::cout << t.first << ",  ";
+    std::cout << "\n  ";
+    for (auto const& t : timesFill)
+        std::cout << t.second << ",\t";
+    std::cout << std::endl;
+}
+
+void benchFind()
+{
+    std::cout << "\n\nBENCH FIND\t";
+    std::vector<std::pair<double, double>> timesFind;
+
+    for (int c = 1; c <= 100000; c *= 10)
+    {
+        std::cout << c << " ";
+        fillSeqInt(c);
+        {
+            std::set<int>  set;
+            for (auto v = std::crbegin(sVectInts); v != std::crend(sVectInts); ++v)
+            {
+                set.insert(*v);
+            }
+
+            auto tpStart = high_resolution_clock::now();
+            for (int i = 0; i < c; ++i)
+            {
+                set.find(i);
+            }
+            auto tpFinish = high_resolution_clock::now();
+            std::chrono::duration<double> diff = tpFinish - tpStart;
+            timesFind.push_back(std::make_pair(diff.count(), 0.0));
+        }
+
+        {
+            random<float> floatRand;
+            algic::skip_list<int, random<float>>  sl(floatRand);
+            for (auto v = std::crbegin(sVectInts); v != std::crend(sVectInts); ++v)
+            {
+                sl.insert(*v);
+            }
+
+            auto tpStart = high_resolution_clock::now();
+            for (int i = 0; i < c; ++i)
+            {
+                sl.find(i);
+            }
+            auto tpFinish = high_resolution_clock::now();
+            std::chrono::duration<double> diff = tpFinish - tpStart;
+            timesFind.back().second = diff.count();
+        }
+    }
+
+    std::cout << "\n  Find times for 1, 10, 100, ... elements:\n\t";
+    for (auto const& t : timesFind)
+        std::cout << t.first << ",  ";
+    std::cout << "\n  ";
+    for (auto const& t : timesFind)
+        std::cout << t.second << ",\t";
+    std::cout << std::endl;
 }
