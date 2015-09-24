@@ -27,9 +27,9 @@ void benchFind();
 /*********** MAIN ***********/
 int main(int argc, char* argv[])
 {
-    //benchFill();
-    //benchFillAsc();
-    //benchFillDesc();
+    benchFill();
+    benchFillAsc();
+    benchFillDesc();
     benchFind();
 
     sVect.clear();
